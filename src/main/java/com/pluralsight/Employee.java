@@ -9,7 +9,7 @@ public class Employee {
     private String department;
     private double payRate;
     private double hoursWorked;
-    private double startTime;  // час початку зміни
+    private double startTime;
 
     // Constructor
     public Employee(int employeeId, String name, String department, double payRate, double hoursWorked) {
@@ -42,6 +42,11 @@ public class Employee {
         return hoursWorked;
     }
 
+    // === ДОДАТИ ЦЕЙ SETTER ===
+    public void setHoursWorked(double hoursWorked) {
+        this.hoursWorked = hoursWorked;
+    }
+
     // Derived getters
     public double getRegularHours() {
         if (hoursWorked <= 40) {
@@ -63,44 +68,61 @@ public class Employee {
         return regularPay + overtimePay;
     }
 
-    // === МЕТОДИ ДІЙ (DO) ===
-
-    // 1. Punch In з вказаним часом
+    // Punch In/Out методи (з параметром)
     public void punchIn(double time) {
         this.startTime = time;
         System.out.println(name + " punched in at " + time);
     }
 
-    // 2. Punch In з поточним часом (OVERLOADED)
+    public void punchOut(double time) {
+        if (startTime == 0.0) {
+            System.out.println("ERROR: " + name + " has not punched in yet.");
+            return;
+        }
+        double hoursThisShift = time - startTime;
+        this.hoursWorked += hoursThisShift;
+        System.out.println(name + " punched out at " + time);
+        System.out.println("Hours worked this shift: " + String.format("%.2f", hoursThisShift));
+        System.out.println("Total hours worked: " + String.format("%.2f", hoursWorked));
+        this.startTime = 0.0;
+    }
+
+    // Overloaded методи (без параметрів)
     public void punchIn() {
-        // Отримуємо поточний час
         LocalDateTime now = LocalDateTime.now();
         int hour = now.getHour();
         int minute = now.getMinute();
-
-        // Конвертуємо в decimal format (наприклад, 14:45 = 14.75)
         double time = hour + (minute / 60.0);
-
         this.startTime = time;
         System.out.println(name + " punched in at " + hour + ":" +
                 String.format("%02d", minute) + " (" + time + ")");
     }
 
-    // 3. Punch Out з вказаним часом
-    public void punchOut(double time) {
-        // Перевіряємо чи працівник пробив початок зміни
+    public void punchOut() {
         if (startTime == 0.0) {
             System.out.println("ERROR: " + name + " has not punched in yet.");
             return;
         }
-
-        // Розраховуємо відпрацьовані години
+        LocalDateTime now = LocalDateTime.now();
+        int hour = now.getHour();
+        int minute = now.getMinute();
+        double time = hour + (minute / 60.0);
         double hoursThisShift = time - startTime;
-
-        // Додаємо до загальної кількості годин
         this.hoursWorked += hoursThisShift;
+        System.out.println(name + " punched out at " + hour + ":" +
+                String.format("%02d", minute) + " (" + time + ")");
+        System.out.println("Hours worked this shift: " + String.format("%.2f", hoursThisShift));
+        System.out.println("Total hours worked: " + String.format("%.2f", hoursWorked));
+        this.startTime = 0.0;
+    }
 
-        System.out.println(name + " punched out at " + time);
-        System.out.println("Hours worked this shift");
+    // === ДОДАТИ ЦЕЙ НОВИЙ МЕТОД ===
+    // Метод punchTimeCard з двома параметрами
+    public void punchTimeCard(double startTime, double endTime) {
+        double hoursThisShift = endTime - startTime;
+        this.hoursWorked += hoursThisShift;
+        System.out.println(name + " worked from " + startTime + " to " + endTime);
+        System.out.println("Hours worked this shift: " + String.format("%.2f", hoursThisShift));
+        System.out.println("Total hours worked: " + String.format("%.2f", hoursWorked));
     }
 }
